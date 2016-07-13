@@ -45,3 +45,10 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.classpath
+.project
+*.prefs
+*.class
+export_CD8a_1,3a,100_A01.csv
+*.csv
+*.xlsx
