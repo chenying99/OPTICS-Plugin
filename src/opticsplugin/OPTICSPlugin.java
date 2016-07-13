@@ -1,18 +1,11 @@
 package opticsplugin;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.Icon;
 
-import com.treestar.lib.PluginHelper;
 import com.treestar.lib.core.ExportFileTypes;
 import com.treestar.lib.core.ExternalAlgorithmResults;
 import com.treestar.lib.core.PopulationPluginInterface;
@@ -70,9 +63,9 @@ public class OPTICSPlugin implements PopulationPluginInterface
 	@Override
 	public ExternalAlgorithmResults invokeAlgorithm(SElement fcmlElem, File sampleFile, File outputFolder)
 	{
-		//results will be stored in here
+		// results will be stored in here
 		ExternalAlgorithmResults results = new ExternalAlgorithmResults();
-		
+
 		int minPts = fOptions.getInt("minPts");
 		int epsilon = fOptions.getInt("epsilon");
 		int dimensions = fOptions.getInt("numParams");
@@ -86,91 +79,8 @@ public class OPTICSPlugin implements PopulationPluginInterface
 		// myAlgorithm.terriblexiClusterExtract(clusterFile, xi);
 		// myAlgorithm.xiClusterExtract(clusterFile, xi);
 		myAlgorithm.peakClusterSeparator(clusterFile, xi);
-		File resultFile = new File(outputFolder, "result." + sampleFile.getName());
 
-		try
-		{
-			BufferedReader br = new BufferedReader(new FileReader(clusterFile));
-			class MyPoint
-			{
-				int eventNum;
-				int clusterNum;
-
-				MyPoint()
-				{
-					super();
-				}
-			}
-
-			ArrayList<MyPoint> eventList = new ArrayList<MyPoint>();
-
-			String line = null;
-			// br.readLine();
-			while ((line = br.readLine()) != null)
-			{
-				String lineData[] = line.split(",");
-				MyPoint p = new MyPoint();
-				p.eventNum = Integer.parseInt(lineData[0]);
-				p.clusterNum = Integer.parseInt(lineData[1]);
-				eventList.add(p);
-			}
-			br.close();
-
-			// We should sort this. Just in case.
-
-			Collections.sort(eventList, new Comparator<MyPoint>()
-			{
-				public int compare(MyPoint p1, MyPoint p2)
-				{
-					if (p1.eventNum < p2.eventNum)
-						return -1;
-					else if (p1.eventNum > p2.eventNum)
-						return 1;
-					else
-						return 0;
-				}
-			});
-
-			/**
-			 * resultWriter writes a single column CSV file. Each row
-			 * corresponds to an event, and is populated with the cluster number
-			 * of the event.
-			 */
-			FileWriter resultWriter = new FileWriter(resultFile);
-
-			int pointCounter = 0;
-			int numEvents = PluginHelper.getNumExportedEvents(fcmlElem);
-
-			for (int i = 0; i < numEvents; i++)
-			{
-
-				if (pointCounter < eventList.size()) // Important...
-				{
-					MyPoint p = eventList.get(pointCounter);
-					if (p.eventNum == i)
-					{
-						resultWriter.write(p.clusterNum + "\n");
-						pointCounter++;
-					} else
-					{
-						resultWriter.write("0\n");
-					}
-				} else
-					resultWriter.write("0\n");
-
-			}
-			resultWriter.close();
-
-		} catch (
-
-		IOException e)
-		{
-			results.setErrorMessage("Something went wrong.");
-		}
-
-		// Return empty results!
-
-		results.setCSVFile(resultFile);
+		results.setCSVFile(clusterFile);
 
 		return results;
 	}

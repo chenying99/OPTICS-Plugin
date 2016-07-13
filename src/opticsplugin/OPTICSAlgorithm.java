@@ -291,11 +291,11 @@ public class OPTICSAlgorithm
 		try
 		{
 			BufferedWriter resultsWriter = new BufferedWriter(new FileWriter(resultsFile));
-			// Write 2 columns, column 1 contains event number,
-			// column 2 contains cluster number
+			//Write the 1 column CSV
+			resultsWriter.write("\n"); //FlowJo wants this...
 			for (OPTICSPoint p : pointList)
 			{
-				resultsWriter.write(p.eventNum + ",");
+				//resultsWriter.write(p.eventNum + ",");
 				// resultsWriter.write(p.orderNum + ",");
 				// resultsWriter.write(p.reachDist + ",");
 				resultsWriter.write(p.clusterNum + "\n");
@@ -492,7 +492,7 @@ public class OPTICSAlgorithm
 			// column 2 contains cluster number
 			for (OPTICSPoint p : pointList)
 			{
-				resultsWriter.write(p.eventNum + ",");
+				//resultsWriter.write(p.eventNum + ",");
 				resultsWriter.write(p.clusterNum + "\n");
 			}
 			resultsWriter.close();
@@ -557,7 +557,7 @@ public class OPTICSAlgorithm
 
 			for (ClusterPoint p : myList)
 			{
-				resultsWriter.write(p.eventNum + ",");
+				//resultsWriter.write(p.eventNum + ",");
 				resultsWriter.write(p.clusterNum + "\n");
 			}
 			resultsWriter.close();
