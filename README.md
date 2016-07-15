@@ -1,7 +1,8 @@
 # OPTICS-Plugin
 Clustering plugin for FlowJo built around the OPTICS algorithm
 
-This is an example of a population plugin for FlowJo. 
+This is an example of a population plugin for FlowJo.
+The full developer documentation is available here: https://www.gitbook.com/book/flowjo-lukej/optics-plugin-documentation/details
 
 The OPTICS Algorithm was published in 1999 in a paper entitled "OPTICS: Ordering Points To Identify the Clustering Structure" by
 Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel, and Jörg Sander. 
