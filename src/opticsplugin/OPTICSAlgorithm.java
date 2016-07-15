@@ -3,7 +3,6 @@ package opticsplugin;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -76,28 +75,20 @@ public class OPTICSAlgorithm
 	 * The first column of output corresponds to the event number The second
 	 * column corresponds to the order it is output in the OPTICS algorithm The
 	 * third column is the point's reachability distance
+	 * 
+	 * @throws IOException
 	 */
-	public void doIt()
+	public void doIt() throws IOException
 	{
-		try
-		{
-			outputWriter = new BufferedWriter(new FileWriter(outputFile));
-			outputWriter.write("eventNum,orderNum,reachability\n");
+		outputWriter = new BufferedWriter(new FileWriter(outputFile));
+		outputWriter.write("eventNum,orderNum,reachability\n");
 
-			// Top view of the algorithm.
-			for (int i = 0; i < pointList.size(); i++)
-				if (!pointList.get(i).processed)
-					expandClusterOrder(pointList.get(i));
+		// Top view of the algorithm.
+		for (int i = 0; i < pointList.size(); i++)
+			if (!pointList.get(i).processed)
+				expandClusterOrder(pointList.get(i));
 
-			outputWriter.close();
-
-		} catch (FileNotFoundException e)
-		{
-			e.printStackTrace();
-		} catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		outputWriter.close();
 	}
 
 	/**
@@ -214,6 +205,8 @@ public class OPTICSAlgorithm
 	 */
 	private void write(OPTICSPoint point)
 	{
+		if (point.reachDist == 0)
+			point.reachDist = epsilon;
 		try
 		{
 			outputWriter.write(point.eventNum + ",");
@@ -229,13 +222,15 @@ public class OPTICSAlgorithm
 	}
 
 	/**
+	 * 	/**
 	 * This is a very simple attempt to separate clusters by detecting peaks in
 	 * the reachability index.
 	 * 
 	 * @param resultsFile
 	 * @param xi
+	 * @return numClusters
 	 */
-	public void peakClusterSeparator(File resultsFile, double xi)
+	public int peakClusterSeparator(File resultsFile, double xi)
 	{
 		this.xi = xi;
 		Collections.sort(pointList, new OPTICSPointOrderComparator());
@@ -244,11 +239,12 @@ public class OPTICSAlgorithm
 
 		int size = pointList.size();
 		peakIndices.add(new Integer(0)); // Seed with index 0.
-		/*double prev2 = pointList.get(0).reachDist;
-		double prev = pointList.get(1).reachDist;
-		double curr = pointList.get(2).reachDist;
-		double next = pointList.get(3).reachDist;
-		double next2 = pointList.get(4).reachDist;*/
+		/*
+		 * double prev2 = pointList.get(0).reachDist; double prev =
+		 * pointList.get(1).reachDist; double curr = pointList.get(2).reachDist;
+		 * double next = pointList.get(3).reachDist; double next2 =
+		 * pointList.get(4).reachDist;
+		 */
 
 		boolean wentDown = true;
 		int countDown = minPts;
@@ -286,25 +282,29 @@ public class OPTICSAlgorithm
 			}
 			numClusters++;
 		}
+		pointList.get(pointList.size() - 1).clusterNum = --numClusters;
 
 		Collections.sort(pointList, new OPTICSPointEventComparator());
 		try
 		{
 			BufferedWriter resultsWriter = new BufferedWriter(new FileWriter(resultsFile));
-			//Write the 1 column CSV
-			resultsWriter.write("\n"); //FlowJo wants this...
+			// Write the 1 column CSV
+			resultsWriter.write("clusterNum,orderNum,reachability\n"); // FlowJo
+																		// wants
+																		// this...
 			for (OPTICSPoint p : pointList)
 			{
-				//resultsWriter.write(p.eventNum + ",");
-				// resultsWriter.write(p.orderNum + ",");
-				// resultsWriter.write(p.reachDist + ",");
-				resultsWriter.write(p.clusterNum + "\n");
+				resultsWriter.write(p.clusterNum + ",");
+				resultsWriter.write(p.orderNum + ",");
+				resultsWriter.write(p.reachDist + "\n");
 			}
 			resultsWriter.close();
 		} catch (IOException e)
 		{
 			e.printStackTrace();
 		}
+		
+		return numClusters;
 	}
 
 	/**
@@ -492,7 +492,7 @@ public class OPTICSAlgorithm
 			// column 2 contains cluster number
 			for (OPTICSPoint p : pointList)
 			{
-				//resultsWriter.write(p.eventNum + ",");
+				// resultsWriter.write(p.eventNum + ",");
 				resultsWriter.write(p.clusterNum + "\n");
 			}
 			resultsWriter.close();
@@ -557,7 +557,7 @@ public class OPTICSAlgorithm
 
 			for (ClusterPoint p : myList)
 			{
-				//resultsWriter.write(p.eventNum + ",");
+				// resultsWriter.write(p.eventNum + ",");
 				resultsWriter.write(p.clusterNum + "\n");
 			}
 			resultsWriter.close();

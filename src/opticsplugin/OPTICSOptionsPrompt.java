@@ -16,6 +16,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
@@ -33,7 +34,8 @@ import com.treestar.lib.xml.SElement;
 
 public class OPTICSOptionsPrompt implements WindowListener, ActionListener, ListSelectionListener, KeyListener
 {
-	boolean cancelled = true; //Setting to true by default prevents issues when 'x' is hit.
+	boolean cancelled = true; // Setting to true by default prevents issues when
+								// 'x' is hit.
 	private JLabel numParametersLabel;
 	private JDialog myWindow;
 	private List<String> parameterList;
@@ -48,18 +50,55 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 	private ButtonGroup minPtsGroup;
 	private JList parameterJList;
 	private JTextField xiField;
+	private SElement fOptions = null;
+	private JCheckBox clusterIt;
 
+	/**
+	 * Default constructor. Simply sets the algorithmElement and parameterList
+	 * to private fields
+	 * 
+	 * @param algorithmElement
+	 * @param parameterList
+	 */
 	OPTICSOptionsPrompt(SElement algorithmElement, List<String> parameterList)
 	{
 		this.parameterList = parameterList;
 		this.algorithmElement = algorithmElement;
 	}
 
-	boolean doIt()
+	/**
+	 * Use this constructor if fOptions already existed in the OPTICSPlugin
+	 * object. This means that the user has opened the plugin node after
+	 * previously running the plugin.
+	 * 
+	 * @param algorithmElement
+	 * @param parameterList
+	 * @param fOptions
+	 */
+	public OPTICSOptionsPrompt(SElement algorithmElement, List<String> parameterList, SElement fOptions)
+	{
+		this.parameterList = parameterList;
+		this.algorithmElement = algorithmElement;
+		this.fOptions = fOptions;
+	}
+
+	/**
+	 * This builds the GUI and displays it. It returns a boolean value -False if
+	 * user cancels or hits the 'x' button -True if user enters values and hits
+	 * the 'run' button
+	 * 
+	 * @return
+	 */
+	public boolean doIt()
 	{
 		int labelWidth = 50;
 		// First, build up the window to display.
+		// We don't touch this JFrame. We deal only with the JDialog.
+		// By all rights, this could be anonymous.
 		JFrame myFrame = new JFrame();
+
+		// Modal so the dialog blocks when it is set visible. Important so a
+		// valid boolean is returned.
 		myWindow = new JDialog(myFrame, "OPTICS Plugin Parameters", true);
 		JPanel myPanel = new JPanel();
 		myPanel.setLayout(new BoxLayout(myPanel, BoxLayout.Y_AXIS));
@@ -72,15 +111,49 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 			parameters[i] = parameterList.get(i);
 		}
 
+		// Make a new JList from the vector (why can't this just take a List
+		// argument?)
 		parameterJList = new JList(parameters);
+
+		/*
+		 * This following block just selects the previously selected parameters
+		 * if the fOptions constructor was used. You can't select one at a time,
+		 * or it will deselect previously selected items. I therefore had to
+		 * build an integer vector with numParams values to use as the indices
+		 * for selection.
+		 */
+		if (fOptions != null)
+		{
+			int numParams = fOptions.getInt("numParams");
+			int[] indices = new int[numParams];
+			for (int i = 0; i < numParams; i++)
+			{
+				String parameterName = fOptions.getChild("Parameter" + i).getText();
+				// System.out.println("parameter name: "+parameterName);
+
+				for (String s : parameterList)
+				{
+					if (s.contains(parameterName))
+					{
+						indices[i] = parameterList.indexOf(s);
+						break;
+					}
+				}
+			}
+			// And now we select the indices...
+			parameterJList.setSelectedIndices(indices);
+		}
+
 		parameterJList.addListSelectionListener(this);
+		// put it in a scroll pane.
 		JScrollPane listScrollPane = new JScrollPane(parameterJList);
 		listScrollPane.setPreferredSize(new Dimension(150, 150));
-
+		// give it labels
 		JLabel listLabel = new JLabel("Please select parameters: ");
 		numParametersLabel = new JLabel("Num Parameters: 0");
 		Box listBox = Box.createVerticalBox();
 		Box scrollPaneBox = Box.createHorizontalBox();
+		// give it a box to put it in.
 		scrollPaneBox.add(Box.createRigidArea(new Dimension(10, 0)));
 		scrollPaneBox.add(listScrollPane);
 		scrollPaneBox.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -98,7 +171,10 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 				+ "Setting higher values will yield better results at the cost of time, while values that are too low may"
 				+ " miss some less dense clusters.";
 		epsField = new JFormattedTextField(formatter);
-		epsField.setText("10000");
+		if (fOptions != null)
+			epsField.setText(Integer.toString(fOptions.getInt("epsilon")));
+		else
+			epsField.setText("10000");
 		epsField.setEditable(true);
 		epsField.setPreferredSize(new Dimension(100, 25));
 		epsField.setToolTipText(epsToolTipText);
@@ -125,8 +201,14 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 		minPtsLabel.setPreferredSize(new Dimension(labelWidth, 25));
 
 		minPtsField = new JFormattedTextField(formatter);
-		minPtsField.setText("0");
-		minPtsField.setEditable(false);
+		if (fOptions != null)
+		{
+			minPtsField.setText(Integer.toString(fOptions.getInt("minPts")));
+		} else
+		{
+			minPtsField.setText("50");
+		}
+		minPtsField.setEditable(true);
 		minPtsField.setPreferredSize(new Dimension(100, 25));
 		minPtsField.setToolTipText(minPtsToolTipText);
 		minPtsField.addActionListener(this);
@@ -140,13 +222,17 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 		minPtsBox.add(Box.createHorizontalGlue());
 		minPtsBox.add(Box.createHorizontalStrut(10));
 
+		// xi label and field.
 		String xiToolTipText = "%drop to define a down slope. Must be between 0 and 1.";
 		JLabel xiLabel = new JLabel("xi:");
 		xiLabel.setToolTipText(xiToolTipText);
 		xiLabel.setPreferredSize(new Dimension(labelWidth, 25));
 
 		xiField = new JTextField();
-		xiField.setText("0.2");
+		if (fOptions != null)
+			xiField.setText(Double.toString(fOptions.getDouble("xi")));
+		else
+			xiField.setText("0.2");
 		xiField.setPreferredSize(new Dimension(100, 25));
 		xiField.setToolTipText(xiToolTipText);
 		xiField.addActionListener(this);
@@ -160,8 +246,9 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 		xiBox.add(Box.createHorizontalGlue());
 		xiBox.add(Box.createHorizontalStrut(10));
 
-		defaultButton = new JRadioButton("Default", true);
-		customButton = new JRadioButton("Custom");
+		// default and custom buttons - for minPts
+		defaultButton = new JRadioButton("Default", false);
+		customButton = new JRadioButton("Custom", true);
 		defaultButton.addActionListener(this);
 		customButton.addActionListener(this);
 		minPtsGroup = new ButtonGroup();
@@ -191,7 +278,20 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 		buttonBox.add(Box.createHorizontalStrut(10));
 		buttonBox.add(cancelButton);
 		buttonBox.add(Box.createHorizontalStrut(10));
-
+		
+		//Create a clustering thing.
+		clusterIt = new JCheckBox("Perform clustering on results: ", true);
+		//we defaulted to true, but if fOptions says it is false...
+		if(fOptions != null)
+		{
+			String doClustering = fOptions.getAttribute("doClustering");
+			if(doClustering.equals("false"))
+				clusterIt.setSelected(false);
+		}
+		clusterIt.setToolTipText("Perform autogating on calculated clusters after the OPTICS algorithm completes.");
+		Box clusterItBox = Box.createHorizontalBox();
+		clusterItBox.add(clusterIt);
+		
 		// Put it all together now
 		myPanel.add(Box.createVerticalStrut(10));
 		myPanel.add(listBox);
@@ -204,12 +304,18 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 		myPanel.add(Box.createVerticalStrut(5));
 		myPanel.add(xiBox);
 		myPanel.add(Box.createVerticalStrut(5));
+		myPanel.add(clusterItBox);
+		myPanel.add(Box.createVerticalStrut(5));
 		myPanel.add(buttonBox);
 		myPanel.add(Box.createVerticalStrut(10));
 		myWindow.add(myPanel);
 		myWindow.addWindowListener(this);
 		myWindow.pack();
 		// myWindow.setResizable(false);
+
+		// doing runButtonCheck() here will enable the run button if fOptions
+		// values were available.
+		runButtonCheck();
 		myWindow.setVisible(true);
 
 		return !cancelled;
@@ -230,6 +336,7 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 	@Override
 	public void windowClosing(WindowEvent e)
 	{
+		// Just making sure that we close it out properly.
 		myWindow.setVisible(false);
 		myWindow.dispose();
 	}
@@ -278,6 +385,8 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 			}
 		}
 
+		// This probably isn't necessary with the runButtonCheck() method, but
+		// we'll leave it here
 		if (source.equals(minPtsField))
 		{
 			int minPts = Integer.MIN_VALUE;
@@ -300,6 +409,7 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 		// Case if cancelled
 		if (source.equals(cancelButton))
 		{
+			// cancelled is set to true by default, but we reiterate it here.
 			cancelled = true;
 			myWindow.setVisible(false);
 			myWindow.dispose();
@@ -308,12 +418,14 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 		// Case if Run - check for valid inputs
 		if (source.equals(runButton))
 		{
+			// Make sure we have valid inputs first!
 			runButtonCheck();
 			if (!runButton.isEnabled())
 				return;
 			int minPts;
 			int epsilon;
 			double xi;
+			// In case something somehow doesn't work, have a try-catch?
 			try
 			{
 				minPts = Integer.parseInt(minPtsField.getText().replaceAll(",", ""));
@@ -329,10 +441,14 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 			options.setInt("epsilon", epsilon);
 			options.setDouble("xi", xi);
 
-			// How to make this meet the standard for creating the list?
-
 			int[] selectedIndices = parameterJList.getSelectedIndices();
 			options.setInt("numParams", selectedIndices.length);
+			
+			String doClustering;
+			if(clusterIt.isSelected()) doClustering = "true";
+			else doClustering = "false";
+			options.setString("doClustering", doClustering);
+
 			for (int i = 0; i < selectedIndices.length; i++)
 			{
 				String parameter = parameterList.get(selectedIndices[i]);
@@ -343,8 +459,12 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 				}
 				options.addContent(new SElement(("Parameter" + i), parameter));
 			}
+
+			// Now add all of those options into the element.
 			algorithmElement.addContent(options);
 
+			// set cancelled to false and close the window. Allows doIt() to
+			// continue from the setVisible() command.
 			cancelled = false;
 			myWindow.setVisible(false);
 			myWindow.dispose();
@@ -361,7 +481,7 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 		// If radio button is selected, make sure
 		if (defaultButton.isSelected())
 		{
-			minPtsField.setText(Integer.toString(numSelected * 2));
+			minPtsField.setText("50");
 		}
 
 		runButtonCheck();
@@ -431,17 +551,17 @@ public class OPTICSOptionsPrompt implements WindowListener, ActionListener, List
 	@Override
 	public void keyPressed(KeyEvent arg0)
 	{
-		//Don't care.
+		// Don't care.
 	}
 
 	@Override
 	public void keyReleased(KeyEvent arg0)
 	{
-		//This makes sure that the input is valid on each keystroke
+		// This makes sure that the input is valid on each keystroke
 		runButtonCheck();
 	}
 
-	@Override 
+	@Override
 	public void keyTyped(KeyEvent arg0)
 	{
 		runButtonCheck();
