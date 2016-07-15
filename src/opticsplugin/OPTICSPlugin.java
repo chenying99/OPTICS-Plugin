@@ -139,8 +139,7 @@ public class OPTICSPlugin implements PopulationPluginInterface
 		if (doClustering.equals("true"))
 			results.setCSVFile(clusterCopy);
 
-		// Having this in there will create 3 parameters - clusterNum, orderNum,
-		// and reachability
+		//Create new parameters!
 		PluginHelper.createClusterParameter(results, "orderNum", orderNumFile);
 		PluginHelper.createClusterParameter(results, "reachability", reachabilityFile);
 
