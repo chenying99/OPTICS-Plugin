@@ -24,6 +24,15 @@ public class OPTICSPoint implements Comparable<OPTICSPoint>
 		clusterNum = -1;
 	}
 
+	/**
+	 * Sets the core distance of the point by looking at distances of its
+	 * neighbors. If the number of neighbors is less than minPts, then the core
+	 * distance is not defined.
+	 * 
+	 * @param neighbors
+	 * @param epsilon
+	 * @param minPts
+	 */
 	public void setCoreDistance(ArrayList<OPTICSPoint> neighbors, double epsilon, int minPts)
 	{
 		if (neighbors.size() < minPts)
@@ -44,9 +53,12 @@ public class OPTICSPoint implements Comparable<OPTICSPoint>
 		{
 			public int compare(OPTICSPoint p1, OPTICSPoint p2)
 			{
-				if(p1.refDist < p2.refDist) return -1;
-				else if (p1.refDist > p2.refDist) return 1;
-				else return 0;
+				if (p1.refDist < p2.refDist)
+					return -1;
+				else if (p1.refDist > p2.refDist)
+					return 1;
+				else
+					return 0;
 			}
 		});
 		for (int i = 0; i < copyNeighbors.size(); i++)
@@ -62,6 +74,9 @@ public class OPTICSPoint implements Comparable<OPTICSPoint>
 		}
 	}
 
+	/**
+	 * Allows for sorting based on reachability distance.
+	 */
 	@Override
 	public int compareTo(OPTICSPoint p)
 	{
