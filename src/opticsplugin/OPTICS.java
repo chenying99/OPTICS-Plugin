@@ -18,7 +18,7 @@ import com.treestar.lib.core.PopulationPluginInterface;
 import com.treestar.lib.fjml.FJML;
 import com.treestar.lib.xml.SElement;
 
-public class OPTICSPlugin implements PopulationPluginInterface
+public class OPTICS implements PopulationPluginInterface
 {
 
 	private List<String> fParameters = new ArrayList<String>();
@@ -53,9 +53,9 @@ public class OPTICSPlugin implements PopulationPluginInterface
 	{
 		// This determines the name of the node, too
 		if (fOptions == null)
-			return "OPTICSPlugin";
+			return "OPTICS";
 
-		String name = "OPTICSPlugin";
+		String name = "OPTICS";
 		name += "_minPts_" + fOptions.getAttribute("minPts");
 		name += "_epsilon_" + fOptions.getAttribute("epsilon");
 		name += "_xi_" + fOptions.getAttribute("xi");
@@ -101,8 +101,12 @@ public class OPTICSPlugin implements PopulationPluginInterface
 			results.setErrorMessage("There was a problem.");
 			return results;
 		}
-
-		File clusterFile = new File(outputFolder, "cluster." + sampleFile.getName());
+		
+		String ext = "_minPts_" + fOptions.getAttribute("minPts");
+		ext += "_epsilon_" + fOptions.getAttribute("epsilon");
+		ext += "_xi_" + fOptions.getAttribute("xi");
+		ext += "_numParams_" + fOptions.getAttribute("numParams");
+		File clusterFile = new File(outputFolder, "cluster" +ext+ sampleFile.getName());
 
 		// Do the cluster extraction
 		myAlgorithm.peakClusterSeparator(clusterFile, xi);
@@ -113,10 +117,7 @@ public class OPTICSPlugin implements PopulationPluginInterface
 
 		// We're going to copy the cluster data into a single-column CSV for
 		// use in the ExternalAlgorithmResult setCSV method.
-		String ext = "_minPts_" + fOptions.getAttribute("minPts");
-		ext += "_epsilon_" + fOptions.getAttribute("epsilon");
-		ext += "_xi_" + fOptions.getAttribute("xi");
-		ext += "_numParams_" + fOptions.getAttribute("numParams");
+		
 		File clusterCopy = new File(outputFolder, "clusterCopy" + ext + sampleFile.getName());
 		File orderNumFile = new File(outputFolder, "orderNum" + ext + sampleFile.getName());
 		File reachabilityFile = new File(outputFolder, "reachability" + ext + sampleFile.getName());
