@@ -47,14 +47,7 @@ public class OPTICS implements PopulationPluginInterface
 	@Override
 	public Icon getIcon()
 	{
-		Icon myIcon = null;
-		File iconFile = new File("OPTICSIcon.gif");
-		URL imgURL = getClass().getResource("OPTICSIcon.gif");
-		if(iconFile.exists())
-			myIcon = new ImageIcon("OPTICSIcon.gif");
-		else if(imgURL != null)
-			myIcon = new ImageIcon(imgURL);
-		return myIcon;
+		return null;
 	}
 
 	@Override
