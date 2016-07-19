@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,11 +48,8 @@ public class OPTICS implements PopulationPluginInterface
 	{
 		Icon myIcon = null;
 		File iconFile = new File("OPTICSIcon.gif");
-		URL imgURL = getClass().getResource("OPTICSIcon.gif");
 		if(iconFile.exists())
 			myIcon = new ImageIcon("OPTICSIcon.gif");
-		else if(imgURL != null)
-			myIcon = new ImageIcon(imgURL);
 		return myIcon;
 	}
 
