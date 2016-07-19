@@ -52,7 +52,15 @@ public class OPTICSPlugin implements PopulationPluginInterface
 	public String getName()
 	{
 		// This determines the name of the node, too
-		return "OPTICSPlugin";
+		if (fOptions == null)
+			return "OPTICSPlugin";
+
+		String name = "OPTICSPlugin";
+		name += "_minPts_" + fOptions.getAttribute("minPts");
+		name += "_epsilon_" + fOptions.getAttribute("epsilon");
+		name += "_xi_" + fOptions.getAttribute("xi");
+		name += "_numParams_" + fOptions.getAttribute("numParams");
+		return name;
 
 	}
 
