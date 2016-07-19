@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import com.treestar.lib.PluginHelper;
 import com.treestar.lib.core.ExportFileTypes;
@@ -45,7 +46,11 @@ public class OPTICS implements PopulationPluginInterface
 	@Override
 	public Icon getIcon()
 	{
-		return null;
+		Icon myIcon = null;
+		File iconFile = new File("OPTICSIcon.gif");
+		if(iconFile.exists())
+			myIcon = new ImageIcon("OPTICSIcon.gif");
+		return myIcon;
 	}
 
 	@Override
