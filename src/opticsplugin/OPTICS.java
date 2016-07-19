@@ -157,6 +157,12 @@ public class OPTICS implements PopulationPluginInterface
 				{
 					orderNumOut.write(lineData[1] + "\n");
 					reachOut.write(lineData[2] + "\n");
+					readLine = true;
+				}
+				else
+				{
+					orderNumOut.write("0\n");
+					reachOut.write("0\n");
 				}
 			}
 			
