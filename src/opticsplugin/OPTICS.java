@@ -135,13 +135,37 @@ public class OPTICS implements PopulationPluginInterface
 
 			orderNumOut.write("orderNum" + ext + "\n");
 			reachOut.write("reachability" + ext + "\n");
-			while ((line = in.readLine()) != null)
+			line = in.readLine();
+			boolean readLine = true;
+			int numEvents = PluginHelper.getNumTotalEvents(fcmlElem);
+			String[] lineData = null;
+			for(int i = 1; i <= numEvents; i++)
 			{
-				String[] lineData = line.split(",");
-				clusterOut.write(lineData[0] + "\n");
-				orderNumOut.write(lineData[1] + "\n");
-				reachOut.write(lineData[2] + "\n");
+				if(readLine)
+				{
+					readLine = false;
+					if((line = in.readLine()) != null)
+					{
+						lineData = line.split(",");
+						clusterOut.write(lineData[0] + "\n");
+					}
+					else break;
+						
+				}
+				
+				if(Integer.parseInt(lineData[3]) == i)
+				{
+					orderNumOut.write(lineData[1] + "\n");
+					reachOut.write(lineData[2] + "\n");
+					readLine = true;
+				}
+				else
+				{
+					orderNumOut.write("0\n");
+					reachOut.write("0\n");
+				}
 			}
+			
 			in.close();
 			clusterOut.close();
 			orderNumOut.close();
