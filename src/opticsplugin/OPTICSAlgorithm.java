@@ -289,14 +289,15 @@ public class OPTICSAlgorithm
 		{
 			BufferedWriter resultsWriter = new BufferedWriter(new FileWriter(resultsFile));
 			// Write the 1 column CSV
-			resultsWriter.write("clusterNum,orderNum,reachability\n"); // FlowJo
+			resultsWriter.write("clusterNum,orderNum,reachability,eventNum\n"); // FlowJo
 																		// wants
 																		// this...
 			for (OPTICSPoint p : pointList)
 			{
 				resultsWriter.write(p.clusterNum + ",");
 				resultsWriter.write(p.orderNum + ",");
-				resultsWriter.write(p.reachDist + "\n");
+				resultsWriter.write(p.reachDist + ",");
+				resultsWriter.write(p.eventNum + "\n");
 			}
 			resultsWriter.close();
 		} catch (IOException e)
