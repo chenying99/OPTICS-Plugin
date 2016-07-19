@@ -51,7 +51,9 @@ public class OPTICSPlugin implements PopulationPluginInterface
 	@Override
 	public String getName()
 	{
+		// This determines the name of the node, too
 		return "OPTICSPlugin";
+
 	}
 
 	@Override
@@ -103,21 +105,27 @@ public class OPTICSPlugin implements PopulationPluginInterface
 
 		// We're going to copy the cluster data into a single-column CSV for
 		// use in the ExternalAlgorithmResult setCSV method.
-		File clusterCopy = new File(outputFolder, "clusterCopy." + sampleFile.getName());
-		File orderNumFile = new File(outputFolder, "orderNum." + sampleFile.getName());
-		File reachabilityFile = new File(outputFolder, "reachability." + sampleFile.getName());
+		String ext = "_minPts_" + fOptions.getAttribute("minPts");
+		ext += "_epsilon_" + fOptions.getAttribute("epsilon");
+		ext += "_xi_" + fOptions.getAttribute("xi");
+		ext += "_numParams_" + fOptions.getAttribute("numParams");
+		File clusterCopy = new File(outputFolder, "clusterCopy" + ext + sampleFile.getName());
+		File orderNumFile = new File(outputFolder, "orderNum" + ext + sampleFile.getName());
+		File reachabilityFile = new File(outputFolder, "reachability" + ext + sampleFile.getName());
+
 		try
 		{
 			BufferedReader in = new BufferedReader(new FileReader(clusterFile));
 			BufferedWriter clusterOut = new BufferedWriter(new FileWriter(clusterCopy));
 			BufferedWriter orderNumOut = new BufferedWriter(new FileWriter(orderNumFile));
 			BufferedWriter reachOut = new BufferedWriter(new FileWriter(reachabilityFile));
-			
+
 			String line = null;
 			in.readLine();
 			clusterOut.write("\n");
-			orderNumOut.write("orderNum\n");
-			reachOut.write("reachability\n");
+
+			orderNumOut.write("orderNum" + ext + "\n");
+			reachOut.write("reachability" + ext + "\n");
 			while ((line = in.readLine()) != null)
 			{
 				String[] lineData = line.split(",");
@@ -139,9 +147,9 @@ public class OPTICSPlugin implements PopulationPluginInterface
 		if (doClustering.equals("true"))
 			results.setCSVFile(clusterCopy);
 
-		//Create new parameters!
-		PluginHelper.createClusterParameter(results, "orderNum", orderNumFile);
-		PluginHelper.createClusterParameter(results, "reachability", reachabilityFile);
+		// Create new parameters!
+		PluginHelper.createClusterParameter(results, "orderNum" + ext, orderNumFile);
+		PluginHelper.createClusterParameter(results, "reachability" + ext, reachabilityFile);
 
 		return results;
 	}
