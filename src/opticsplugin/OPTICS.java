@@ -101,12 +101,12 @@ public class OPTICS implements PopulationPluginInterface
 			results.setErrorMessage("There was a problem.");
 			return results;
 		}
-		
+
 		String ext = "_minPts_" + fOptions.getAttribute("minPts");
 		ext += "_epsilon_" + fOptions.getAttribute("epsilon");
 		ext += "_xi_" + fOptions.getAttribute("xi");
 		ext += "_numParams_" + fOptions.getAttribute("numParams");
-		File clusterFile = new File(outputFolder, "cluster" +ext+ sampleFile.getName());
+		File clusterFile = new File(outputFolder, "cluster" + ext + sampleFile.getName());
 
 		// Do the cluster extraction
 		myAlgorithm.peakClusterSeparator(clusterFile, xi);
@@ -117,7 +117,7 @@ public class OPTICS implements PopulationPluginInterface
 
 		// We're going to copy the cluster data into a single-column CSV for
 		// use in the ExternalAlgorithmResult setCSV method.
-		
+
 		File clusterCopy = new File(outputFolder, "clusterCopy" + ext + sampleFile.getName());
 		File orderNumFile = new File(outputFolder, "orderNum" + ext + sampleFile.getName());
 		File reachabilityFile = new File(outputFolder, "reachability" + ext + sampleFile.getName());
@@ -130,44 +130,54 @@ public class OPTICS implements PopulationPluginInterface
 			BufferedWriter reachOut = new BufferedWriter(new FileWriter(reachabilityFile));
 
 			String line = null;
-			in.readLine(); //clear header
+			in.readLine(); // clear header
 			clusterOut.write("\n");
 
 			orderNumOut.write("orderNum" + ext + "\n");
 			reachOut.write("reachability" + ext + "\n");
-			//line = in.readLine(); //read first line
+			// line = in.readLine(); //read first line
 			boolean readLine = true;
 			int numEvents = PluginHelper.getNumTotalEvents(fcmlElem);
 			System.out.println(numEvents);
 			String[] lineData = null;
-			for(int i = 1; i <= numEvents; i++)
+			for (int i = 1; i <= numEvents; i++)
 			{
-				if(readLine)
-				{
-					readLine = false;
-					if((line = in.readLine()) != null)
+				if (in.ready())
+					if (readLine)
 					{
-						lineData = line.split(",");
-						clusterOut.write(lineData[0] + "\n"); //write the cluster csv on each read
+						readLine = false;
+						if ((line = in.readLine()) != null)
+						{
+							lineData = line.split(",");
+							clusterOut.write(lineData[0] + "\n"); // write the
+																	// cluster
+																	// csv on
+																	// each read
+						} else
+						{
+							in.close();
+						}
+
 					}
-					else break;
-						
-				}
-				
-				if(Integer.parseInt(lineData[3]) == i)
-				{
-					orderNumOut.write(lineData[1] + "\n");
-					reachOut.write(lineData[2] + "\n");
-					readLine = true;
-				}
+				if (line != null)
+					if (Integer.parseInt(lineData[3]) == i)
+					{
+						orderNumOut.write(lineData[1] + "\n");
+						reachOut.write(lineData[2] + "\n");
+						readLine = true;
+					} else
+					{
+						orderNumOut.write("0\n");
+						reachOut.write("0\n");
+					}
 				else
 				{
 					orderNumOut.write("0\n");
 					reachOut.write("0\n");
 				}
 			}
-			
-			in.close();
+			if (in.ready())
+				in.close();
 			clusterOut.close();
 			orderNumOut.close();
 			reachOut.close();
