@@ -130,12 +130,12 @@ public class OPTICS implements PopulationPluginInterface
 			BufferedWriter reachOut = new BufferedWriter(new FileWriter(reachabilityFile));
 
 			String line = null;
-			in.readLine();
+			in.readLine(); //clear header
 			clusterOut.write("\n");
 
 			orderNumOut.write("orderNum" + ext + "\n");
 			reachOut.write("reachability" + ext + "\n");
-			line = in.readLine();
+			//line = in.readLine(); //read first line
 			boolean readLine = true;
 			int numEvents = PluginHelper.getNumTotalEvents(fcmlElem);
 			String[] lineData = null;
@@ -147,7 +147,7 @@ public class OPTICS implements PopulationPluginInterface
 					if((line = in.readLine()) != null)
 					{
 						lineData = line.split(",");
-						clusterOut.write(lineData[0] + "\n");
+						clusterOut.write(lineData[0] + "\n"); //write the cluster csv on each read
 					}
 					else break;
 						
