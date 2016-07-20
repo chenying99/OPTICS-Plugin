@@ -138,6 +138,7 @@ public class OPTICS implements PopulationPluginInterface
 			//line = in.readLine(); //read first line
 			boolean readLine = true;
 			int numEvents = PluginHelper.getNumTotalEvents(fcmlElem);
+			System.out.println(numEvents);
 			String[] lineData = null;
 			for(int i = 1; i <= numEvents; i++)
 			{
