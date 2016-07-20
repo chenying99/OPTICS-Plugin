@@ -270,7 +270,7 @@ public class OPTICSAlgorithm
 			 */
 		}
 		peakIndices.add(pointList.indexOf(pointList.get(size - 1)));
-		System.out.println(peakIndices);
+		//System.out.println(peakIndices);
 		int numClusters = 1;
 		for (int i = 0; i < peakIndices.size() - 1; i++)
 		{

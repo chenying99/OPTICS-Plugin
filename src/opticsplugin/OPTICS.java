@@ -138,11 +138,13 @@ public class OPTICS implements PopulationPluginInterface
 			// line = in.readLine(); //read first line
 			boolean readLine = true;
 			int numEvents = PluginHelper.getNumTotalEvents(fcmlElem);
-			System.out.println(numEvents);
+			//System.out.println(numEvents);
 			String[] lineData = null;
+			
+			//big ugly block probably could be smaller.
 			for (int i = 1; i <= numEvents; i++)
 			{
-				if (in.ready())
+				if (in != null)
 					if (readLine)
 					{
 						readLine = false;
@@ -156,9 +158,11 @@ public class OPTICS implements PopulationPluginInterface
 						} else
 						{
 							in.close();
+							in = null;
 						}
 
 					}
+				
 				if (line != null)
 					if (Integer.parseInt(lineData[3]) == i)
 					{
@@ -176,7 +180,8 @@ public class OPTICS implements PopulationPluginInterface
 					reachOut.write("0\n");
 				}
 			}
-			if (in.ready())
+			
+			if (in != null) //close if still open.
 				in.close();
 			clusterOut.close();
 			orderNumOut.close();
