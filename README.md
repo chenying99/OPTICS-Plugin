@@ -23,5 +23,5 @@ Without limiting the foregoing, FlowJo, LLC makes no warranty that: 1. the softw
 
 The use of the software downloaded through the FlowJo Exchange site is done at your own discretion and risk and with agreement that you will be solely responsible for any damage to your computer system or loss of data that results from such activities. No advice or information, whether oral or written, obtained by you from FlowJo, LLC, its its website, its contributors, employees, or contractors shall create any warranty for the software.
 
-View the apache 2.0 license [here](http://www.apache.org/licenses/LICENSE-2.0)
+[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
