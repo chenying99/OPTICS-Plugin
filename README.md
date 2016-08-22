@@ -9,6 +9,10 @@ The user may specify the minimum points the algorithm requires to define a clust
 
 The OPTICS Plugin was developed for FlowJo v10.1r7, and will not work on earlier versions.
 
+Read full Gitbook: https://flowjollc.gitbooks.io/optics-plugin-developer-documentation/content/
+
+---
+
 ##Disclaimer
 
 Software distributed under the APACHE 2.0 License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
@@ -20,8 +24,4 @@ Without limiting the foregoing, FlowJo, LLC makes no warranty that: 1. the softw
 The use of the software downloaded through the FlowJo Exchange site is done at your own discretion and risk and with agreement that you will be solely responsible for any damage to your computer system or loss of data that results from such activities. No advice or information, whether oral or written, obtained by you from FlowJo, LLC, its its website, its contributors, employees, or contractors shall create any warranty for the software.
 
 View the apache 2.0 license [here](http://www.apache.org/licenses/LICENSE-2.0)
-
----
-
-Read full Gitbook: https://flowjollc.gitbooks.io/optics-plugin-developer-documentation/content/
 
